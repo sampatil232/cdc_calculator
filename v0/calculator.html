@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
+        }
+        .calculator {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 300px;
+            position: relative;
+        }
+        .dark-mode .calculator {
+            background-color: #071115;
+            color: #f8fafd;
+        }
+        .dark-mode input, .dark-mode button {
+            background-color: #1b2f38;
+            color: #f8fafd;
+        }
+        .dark-mode .reset-button {
+            background-color: #2d191e;
+            color: #bd3740;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        button {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #3a7bc8;
+        }
+        #result {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            background-color: #f0f4f8;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .reset-button {
+            background-color: #e04a4a;
+        }
+        .reset-button:hover {
+            background-color: #c83b3b;
+        }
+        #history {
+            margin-top: 20px;
+        }
+        #history h3 {
+            text-align: center;
+            color: #333;
+            margin-top: 1rem;
+        }
+        #history ul {
+            list-style-type: none;
+            padding: 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        #history ul li {
+            background-color: #f0f4f8;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Simple Calculator</h1>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        <div class="input-group">
+            <label for="num1">Number 1:</label>
+            <input type="number" id="num1" placeholder="Enter first number">
+        </div>
+        <div class="input-group">
+            <label for="num2">Number 2:</label>
+            <input type="number" id="num2" placeholder="Enter second number">
+        </div>
+        <div class="button-group">
+            <button onclick="performOperation('add')">Add</button>
+            <button onclick="performOperation('sub')">Subtract</button>
+            <button onclick="performOperation('mul')">Multiply</button>
+            <button onclick="performOperation('div')">Divide</button>
+        </div>
+        <button class="reset-button" onclick="resetCalculator()">Reset</button>
+        <div id="result">Result: </div>
+        
+        <div id="history">
+            <h3>Calculation History</h3>
+            <ul id="historyList"></ul>
+        </div>
+    </div>
+
+    <script>
+        let history = [];
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+
+        function performOperation(operation) {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+            let result;
+            
+            if (isNaN(num1) || isNaN(num2)) {
+                result = "Please enter valid numbers!";
+                document.getElementById('result').style.color = 'red';
+            } else {
+                switch (operation) {
+                    case 'add':
+                        result = num1 + num2;
+                        break;
+                    case 'sub':
+                        result = num1 - num2;
+                        break;
+                    case 'mul':
+                        result = num1 * num2;
+                        break;
+                    case 'div':
+                        if (num2 === 0) {
+                            result = "Cannot divide by zero!";
+                            document.getElementById('result').style.color = 'red';
+                        } else {
+                            result = num1 / num2;
+                            document.getElementById('result').style.color = '#333';
+                        }
+                        break;
+                    default:
+                        result = "Invalid operation!";
+                        document.getElementById('result').style.color = 'red';
+                }
+                document.getElementById('result').style.color = '#333';
+                addHistoryEntry(`${num1} ${operationSymbol(operation)} ${num2} = ${result}`);
+            }
+
+            document.getElementById('result').textContent = "Result: " + result;
+        }
+
+        function operationSymbol(operation) {
+            switch (operation) {
+                case 'add': return '+';
+                case 'sub': return '-';
+                case 'mul': return '*';
+                case 'div': return '/';
+            }
+        }
+
+        function addHistoryEntry(entry) {
+            history.push(entry);
+            updateHistory();
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById("historyList");
+            historyList.innerHTML = "";
+            history.forEach(entry => {
+                const listItem = document.createElement("li");
+                listItem.textContent = entry;
+                historyList.appendChild(listItem);
+            });
+        }
+
+        function resetCalculator() {
+            document.getElementById('num1').value = '';
+            document.getElementById('num2').value = '';
+            document.getElementById('result').textContent = "Result: ";
+            document.getElementById('result').style.color = '#333';
+            history = [];
+            updateHistory();
+        }
+    </script>
+</body>
+</html>
